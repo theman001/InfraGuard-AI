@@ -1,0 +1,43 @@
+{
+  "name": "search_decisions",
+  "description": "판례·결정례를 키워드로 실시간 검색합니다. 법령 조문 검색(rag_search)과 별개로, 자문 요청과 관련된 판례를 반드시 검색하세요. domain은 'precedent'(대법원 판례)를 기본으로 사용하고, 개인정보 관련이면 'pipc'(개인정보위 결정문)도 추가 검색하세요.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "domain": {
+        "type": "string",
+        "enum": [
+          "precedent", "interpretation", "tax_tribunal", "customs",
+          "constitutional", "admin_appeal", "ftc", "pipc", "nlrc", "acr",
+          "appeal_review", "acr_special",
+          "school", "public_corp", "public_inst",
+          "treaty", "english_law"
+        ],
+        "description": "검색 대상 도메인: precedent(판례), interpretation(해석례), tax_tribunal(조세심판원 재결례), customs(관세청 법령해석), constitutional(헌재 결정례), admin_appeal(행정심판례), ftc(공정위 결정문), pipc(개인정보위 결정문), nlrc(노동위 결정문), acr(권익위 결정문), appeal_review(소청심사 재결례), acr_special(권익위 특별행정심판), school(학칙), public_corp(공사공단 규정), public_inst(공공기관 규정), treaty(조약), english_law(영문법령)"
+      },
+      "query": {
+        "type": "string",
+        "description": "검색 키워드 (예: '영상정보처리기기 설치 동의')"
+      },
+      "display": {
+        "type": "integer",
+        "description": "페이지당 결과 수 (기본: 10, 최대: 100)",
+        "default": 10
+      },
+      "page": {
+        "type": "integer",
+        "description": "페이지 번호 (기본: 1)",
+        "default": 1
+      },
+      "sort": {
+        "type": "string",
+        "description": "정렬: lasc/ldes(이름순), dasc/ddes(날짜순), nasc/ndes(번호순)"
+      },
+      "options": {
+        "type": "object",
+        "description": "도메인별 추가 옵션. precedent: {court, caseNumber, fromDate, toDate}"
+      }
+    },
+    "required": ["domain"]
+  }
+}

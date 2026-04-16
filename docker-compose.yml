@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  infra-guard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: infra-guard-ai
+    restart: unless-stopped
+
+    ports:
+      - "8501:8501"
+
+    # ── 환경 변수 ──────────────────────────────────────────────────────────────
+    # .env 파일을 루트에 생성해 키를 설정하세요 (.env.example 참고)
+    env_file:
+      - .env
+    environment:
+      # DB / ChromaDB 경로 — 볼륨 마운트 경로와 일치시킴
+      - DB_PATH=/app/db/app.db
+      - CHROMA_PATH=/app/data/chroma_db
+
+    # ── 퍼시스턴트 볼륨 ───────────────────────────────────────────────────────
+    # NAS 등 외부 경로로 변경하려면 왼쪽 경로를 수정하세요
+    # 예) /mnt/nas/infra-guard/db:/app/db
+    volumes:
+      - ./db:/app/db
+      - ./data/chroma_db:/app/data/chroma_db
+      # sentence-transformers 모델 캐시 (재다운로드 방지)
+      - huggingface-cache:/app/.cache/huggingface
+
+    # ── 헬스체크 ──────────────────────────────────────────────────────────────
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+# 모델 캐시는 named volume으로 보존 (컨테이너 재시작 시 재다운로드 방지)
+volumes:
+  huggingface-cache:

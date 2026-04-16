@@ -1,0 +1,29 @@
+{
+  "name": "get_decision_text",
+  "description": "판례·결정례 원문을 조회합니다. search_decisions 결과에서 얻은 일련번호(id)로 원문 전체를 가져옵니다. 판결요지·판시사항이 필요한 경우 사용하세요.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "domain": {
+        "type": "string",
+        "enum": [
+          "precedent", "interpretation", "tax_tribunal", "customs",
+          "constitutional", "admin_appeal", "ftc", "pipc", "nlrc", "acr",
+          "appeal_review", "acr_special",
+          "school", "public_corp", "public_inst",
+          "treaty", "english_law"
+        ],
+        "description": "검색 대상 도메인: precedent(판례), interpretation(해석례), tax_tribunal(조세심판원 재결례), customs(관세청 법령해석), constitutional(헌재 결정례), admin_appeal(행정심판례), ftc(공정위 결정문), pipc(개인정보위 결정문), nlrc(노동위 결정문), acr(권익위 결정문), appeal_review(소청심사 재결례), acr_special(권익위 특별행정심판), school(학칙), public_corp(공사공단 규정), public_inst(공공기관 규정), treaty(조약), english_law(영문법령)"
+      },
+      "id": {
+        "type": "string",
+        "description": "일련번호/ID (search_decisions 결과에서 획득)"
+      },
+      "options": {
+        "type": "object",
+        "description": "도메인별 추가 옵션. precedent: {caseName}"
+      }
+    },
+    "required": ["domain", "id"]
+  }
+}

@@ -1,0 +1,210 @@
+[
+  {
+    "law_name": "개인정보 보호법",
+    "mst_id": "270351",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "정보통신망 이용촉진 및 정보보호 등에 관한 법률",
+    "mst_id": "277377",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "산업기술의 유출방지 및 보호에 관한 법률",
+    "mst_id": "276519",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "근로기준법",
+    "mst_id": "265959",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "상법",
+    "mst_id": "284143",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "전자문서 및 전자거래 기본법",
+    "mst_id": "236053",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "정보통신기반 보호법",
+    "mst_id": "259005",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "클라우드컴퓨팅 발전 및 이용자 보호에 관한 법률",
+    "mst_id": "277387",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "전기통신사업법",
+    "mst_id": "276243",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "경비업법",
+    "mst_id": "268091",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "소방시설 설치 및 관리에 관한 법률",
+    "mst_id": "236977",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "화재의 예방 및 안전관리에 관한 법률",
+    "mst_id": "283705",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "재난 및 안전관리 기본법",
+    "mst_id": "268803",
+    "law_type": "법률",
+    "category": "공통",
+    "sector": null,
+    "cert": null
+  },
+  {
+    "law_name": "전자금융거래법",
+    "mst_id": "280277",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "금융/핀테크",
+    "cert": null
+  },
+  {
+    "law_name": "신용정보의 이용 및 보호에 관한 법률",
+    "mst_id": "260423",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "금융/핀테크",
+    "cert": null
+  },
+  {
+    "law_name": "금융실명거래 및 비밀보장에 관한 법률",
+    "mst_id": "270423",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "금융/핀테크",
+    "cert": null
+  },
+  {
+    "law_name": "의료법",
+    "mst_id": "285327",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "의료/헬스케어",
+    "cert": null
+  },
+  {
+    "law_name": "의료기기법",
+    "mst_id": "268885",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "의료/헬스케어",
+    "cert": null
+  },
+  {
+    "law_name": "생명윤리 및 안전에 관한 법률",
+    "mst_id": "276665",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "의료/헬스케어",
+    "cert": null
+  },
+  {
+    "law_name": "산업안전보건법",
+    "mst_id": "276853",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "제조",
+    "cert": null
+  },
+  {
+    "law_name": "중대재해 처벌 등에 관한 법률",
+    "mst_id": "228817",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "제조",
+    "cert": null
+  },
+  {
+    "law_name": "소프트웨어 진흥법",
+    "mst_id": "265845",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "공공/공급망",
+    "cert": null
+  },
+  {
+    "law_name": "전자상거래 등에서의 소비자보호에 관한 법률",
+    "mst_id": "282793",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "유통/이커머스",
+    "cert": null
+  },
+  {
+    "law_name": "표시ㆍ광고의 공정화에 관한 법률",
+    "mst_id": "268659",
+    "law_type": "법률",
+    "category": "업종별",
+    "sector": "유통/이커머스",
+    "cert": null
+  },
+  {
+    "law_name": "개인정보 보호법 시행령",
+    "mst_id": "273745",
+    "law_type": "대통령령",
+    "category": "인증별",
+    "sector": null,
+    "cert": "ISMS-P"
+  },
+  {
+    "law_name": "정보통신망 이용촉진 및 정보보호 등에 관한 법률 시행령",
+    "mst_id": "284861",
+    "law_type": "대통령령",
+    "category": "인증별",
+    "sector": null,
+    "cert": "ISMS-P"
+  }
+]
