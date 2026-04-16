@@ -29,11 +29,15 @@ ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
 ENV HF_HOME=/app/.cache/huggingface
 
 # 런타임 시스템 의존성 (폰트, lxml 등)
+# fonts-nanum: NanumGothic 한글 폰트 → /usr/share/fonts/truetype/nanum/
+# fonts-noto-cjk: Noto CJK (fallback)
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libxml2 \
         libxslt1.1 \
+        fonts-nanum \
         fonts-noto-cjk \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && fc-cache -fv
 
 # 빌드 스테이지에서 설치된 패키지 복사
 COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages

@@ -26,11 +26,22 @@ from reportlab.platypus import (
 # ─────────────────────────────────────────────────────────────────────────────
 
 _FONT_CANDIDATES = [
+    # Windows
     r"C:\Windows\Fonts\malgun.ttf",
     r"C:\Windows\Fonts\malgunbd.ttf",
+    # Linux — Nanum (apt: fonts-nanum)
     "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
-    "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttf",
+    "/usr/share/fonts/truetype/nanum/NanumBarunGothic.ttf",
+    # Linux — Noto CJK (apt: fonts-noto-cjk)
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/noto-cjk/NotoSansCJKkr-Regular.otf",
+    # macOS
     "/System/Library/Fonts/AppleGothic.ttf",
+    "/Library/Fonts/AppleGothic.ttf",
+    # 프로젝트 로컬 폰트 (fonts/ 폴더에 TTF 배치 시 최우선)
+    str(Path(__file__).parent.parent.parent / "fonts" / "NanumGothic.ttf"),
+    str(Path(__file__).parent.parent.parent / "fonts" / "malgun.ttf"),
 ]
 
 _FONT_NAME  = "KoreanFont"
@@ -38,18 +49,30 @@ _REGISTERED = False
 
 
 def _register() -> None:
+    """한글 TTF 폰트를 pdfmetrics에 등록. 이미 등록됐으면 스킵."""
     global _REGISTERED, _FONT_NAME
     if _REGISTERED:
         return
+
+    # pdfmetrics에 이미 등록된 경우(핫리로드 등) → 재등록 불필요
+    try:
+        if _FONT_NAME in pdfmetrics.getRegisteredFontNames():
+            _REGISTERED = True
+            return
+    except Exception:
+        pass
+
     for path in _FONT_CANDIDATES:
-        if Path(path).exists():
-            try:
-                pdfmetrics.registerFont(TTFont(_FONT_NAME, path))
-                _REGISTERED = True
-                return
-            except Exception:
-                continue
-    # fallback: Helvetica (한글 깨짐이지만 예외는 없음)
+        if not Path(path).exists():
+            continue
+        try:
+            pdfmetrics.registerFont(TTFont(_FONT_NAME, path))
+            _REGISTERED = True
+            return
+        except Exception:
+            continue
+
+    # fallback: Helvetica (한글 깨짐이지만 예외 없이 동작)
     _FONT_NAME = "Helvetica"
     _REGISTERED = True
 
