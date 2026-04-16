@@ -38,6 +38,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libxslt1.1 \
         fonts-nanum \
         fonts-noto-cjk \
+        fontconfig \
     && rm -rf /var/lib/apt/lists/* \
     && fc-cache -fv
 
