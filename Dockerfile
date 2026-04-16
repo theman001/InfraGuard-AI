@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libxml2-dev \
         libxslt1-dev \
         zlib1g-dev \
+        pkg-config \
+        libcairo2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 의존성 먼저 설치 (레이어 캐시 활용)
