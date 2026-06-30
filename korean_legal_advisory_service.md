@@ -22,20 +22,39 @@
 ```
 [사용자 - 웹 브라우저]
         ↓ 포트포워딩 (로컬/외부 접근)
-[Streamlit 웹 앱 - 로컬 실행]
-        │
-        ├── 계정 관리 (로그인/회원가입)
-        ├── 템플릿 관리
-        ├── 환경 설정값 입력
-        ├── 자문 요청 입력
-        ├── history 참고 옵션 ON/OFF
-        │
-        ├── ChromaDB (법령 RAG)
-        ├── 대법원 API (판례 실시간)
-        ├── Claude API (자문 생성)
-        └── DB (계정 / 보고서 / 히스토리)
-                ↓
-        자문 보고서 출력 + PDF 저장
+        
+[Rock 5 보드 (ARM64) - Docker 컨테이너 구성]
+├── 컨테이너 1: Streamlit 웹 앱
+│   ├── 계정 관리 (로그인/회원가입)
+│   ├── 템플릿 관리
+│   ├── 환경 설정값 입력
+│   ├── 자문 요청 입력
+│   └── history 참고 옵션 ON/OFF
+│
+├── 컨테이너 2: korean-law-mcp
+│   └── HTTP 서버 (port 3000)
+│       법령해석례 / 신구법 대조 / 3단 위임구조 / 헌재·행심
+│
+├── 컨테이너 3: ChromaDB
+│   └── 법령 RAG 벡터 DB
+│
+└── 볼륨
+    ├── SQLite DB (계정 / 보고서 / 히스토리)
+    └── ChromaDB 데이터
+
+        ↓ 외부 API 호출
+
+[외부 서비스]
+├── 국가법령정보센터 API (법령 수집 + 판례 + 해석례 - MCP 경유)
+└── Claude API (자문 생성)
+```
+
+**컨테이너 간 통신**
+```
+Streamlit
+    ├── → korean-law-mcp (HTTP, 내부 네트워크)
+    ├── → ChromaDB (내부 네트워크)
+    └── → 외부 API (Claude, 대법원, 법령정보센터)
 ```
 
 ---
@@ -107,23 +126,50 @@
 | ISMS-P | 개인정보보호법 시행령·시행규칙, 정보통신망법 시행령 |
 | ISO 27001 | 국제표준 연계 국내법 매핑 (개인정보보호법, 정보통신망법) |
 
-### 2. 판례 연동
+### 2. 판례 및 법령해석 연동
 
-- **방식:** RAG 구축 X → 실시간 API 호출
-- **출처:** 대법원 판례 Open API
-- **시점:** 자문 요청 시마다 실시간 검색
+**모든 법령 정보를 korean-law-mcp로 통합 처리**
+- 판례 검색도 대법원 API 별도 연동 없이 MCP의 `search_precedents` 도구 활용
+- 국가법령정보센터 API 키 하나로 법령 + 판례 + 해석례 등 전부 커버
+
+| MCP 도구 | 용도 | 연계 케이스 |
+|---|---|---|
+| `search_precedents` | 판례 검색 (대법원 + 헌재 포함) | 자문 시 관련 판례 검색 |
+| `get_precedent_text` | 판례 전문 조회 | 판례 상세 내용 확인 |
+| `search_interpretations` | 법령해석례 검색 | 회색지대 판단 근거 |
+| `get_interpretation_text` | 법령해석례 전문 조회 | 공식 해석 확인 |
+| `compare_old_new` | 신구법 대조 | Case 3 (신법 개정) 판단 |
+| `get_three_tier` | 법률→시행령→시행규칙 3단 구조 | Case 1 (상위법/하위법) 판단 |
+| `search_constitutional_decisions` | 헌재 결정례 검색 | 추가 법적 근거 |
+| `search_admin_appeals` | 행정심판례 검색 | 추가 법적 근거 |
+
 - **키워드 생성 방식:** LLM이 사전 생성
-  - 자문 요청 프롬프트를 LLM이 먼저 읽고 판례 검색에 적합한 키워드 생성
-  - 생성된 키워드로 대법원 API 호출
+  - 자문 요청 프롬프트를 LLM이 먼저 읽고 판례/해석례 검색에 적합한 키워드 생성
+  - 생성된 키워드로 MCP 도구 호출
   - 예) 사용자 입력: "재택근무자 개인 디바이스 허용 정책"
         → LLM 생성 키워드: "BYOD 개인정보 수집 동의"
-  - API 호출 흐름:
-    ```
-    1. 사용자 요청 입력
-    2. LLM → 판례 검색 키워드 생성 (API 호출 1회)
-    3. 대법원 API → 판례 검색 (키워드 기반)
-    4. 판례 결과 + RAG 법령 결과 → LLM 최종 자문 생성
-    ```
+- **설치:** Rock 5 Docker 컨테이너로 배포
+  ```bash
+  git clone https://github.com/chrisryugj/korean-law-mcp
+  docker build -t korean-law-mcp .
+  docker run -d \
+    --name korean-law-mcp \
+    --restart always \
+    -e LAW_OC=발급받은키 \
+    -p 3000:3000 \
+    korean-law-mcp
+  ```
+- **연동 방식:** Streamlit 컨테이너 → korean-law-mcp 컨테이너 HTTP 호출 (내부 네트워크)
+  ```
+  Streamlit (컨테이너 1)
+      ↓ HTTP 요청 (Docker 내부 네트워크)
+  korean-law-mcp (컨테이너 2, port 3000)
+      ↓ 응답
+  판례 / 법령해석례 / 신구법 대조 등 결과
+      ↓
+  Claude API로 전달
+  ```
+- **API 키:** 법제처 API 키 (국가법령정보센터, ✅ 완료 / 기존 키 그대로 사용)
 
 ### 3. 법령 우선순위 원칙 및 회색지대 처리
 
@@ -261,7 +307,22 @@ User Prompt (요청마다 조합)
 ### 5. 히스토리 시스템
 
 ```
-자문 요청 시 흐름
+자문 요청 시 전체 흐름
+─────────────────────────────────────
+1. 사용자 요청 입력
+2. LLM → 판례/해석례 검색 키워드 생성
+3. RAG (ChromaDB) → 관련 법령 조문 검색 (시맨틱)
+4. korean-law-mcp
+   → 판례 검색 (search_precedents)
+   → 법령해석례 검색 (search_interpretations)
+   → 3단 위임구조 확인 (get_three_tier)
+   → 신구법 대조 (compare_old_new, 필요 시)
+   → 헌재·행심 결정 검색 (필요 시)
+5. LLM → 3~4 종합하여 자문 보고서 생성
+```
+
+```
+히스토리 저장 흐름
 ─────────────────────────────────────
 1. 해당 계정의 history 리스트 (한줄요약 + URL) 불러오기
 2. Claude API에 함께 전달
@@ -414,15 +475,16 @@ status = "pending" 으로 저장
 
 | 역할 | 도구 |
 |---|---|
-| 웹 UI | Streamlit |
+| 웹 UI | Streamlit (Docker 컨테이너) |
 | 법령 수집 | 국가법령정보센터 Open API |
-| 벡터 DB | ChromaDB |
+| 벡터 DB | ChromaDB (Docker 컨테이너) |
 | 임베딩 | ko-sroberta-multitask (로컬, 무료) |
-| 판례 | 대법원 판례 Open API (실시간) |
+| 법령 RAG 오케스트레이션 | LangChain |
+| 법령해석례 / 판례 / 신구법 대조 / 3단 위임구조 / 헌재·행심 | korean-law-mcp (Docker 컨테이너, HTTP 호출) |
 | LLM | Claude API (claude-sonnet) |
-| RAG 오케스트레이션 | LangChain |
 | 스케줄러 | APScheduler |
-| DB | SQLite (로컬) |
+| DB | SQLite (Docker 볼륨) |
+| 배포 환경 | Rock 5 보드 (ARM64) + Docker |
 | 외부 접근 | 포트포워딩 (직접 설정) |
 | PDF 출력 | WeasyPrint (HTML/CSS 기반) |
 
@@ -456,12 +518,12 @@ status = "pending" 으로 저장
 ├── System Prompt 설계 (결과값 제어)
 ├── User Prompt 조합 로직
 │   (템플릿 + 환경값 + RAG결과 + 요청 + history)
+├── korean-law-mcp 설치 및 연동
+│   (판례 / 법령해석례 / 신구법 대조 / 3단 위임구조 / 헌재·행심)
 ├── 한줄요약 생성 로직
 ├── 유사 history 선별 로직
 ├── history 참고 옵션 ON/OFF 처리
-├── 대법원 API 판례 실시간 호출 연동
 └── 회색지대 처리 로직
-   (대법원 API 키 발급 - 2단계 전 준비)
 
 3단계 - Streamlit UI 구성
 ├── 계정 관리 (로그인/회원가입)
@@ -501,6 +563,6 @@ status = "pending" 으로 저장
 
 | 항목 | 상태 | 비고 |
 |---|---|---|
-| 국가법령정보센터 API 키 | ✅ 완료 | |
-| 대법원 판례 API | 🔲 미완료 | 2단계 전 준비 |
+| 국가법령정보센터 API 키 | ✅ 완료 | korean-law-mcp에도 동일 키 사용, 판례 포함 |
+| korean-law-mcp 설치 | 🔲 미완료 | Rock 5에 Docker 컨테이너로 배포 |
 | Claude API 키 | 🔲 미완료 | 1단계 후 준비 |
