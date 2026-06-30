@@ -36,3 +36,7 @@ extra-streamlit-components>=0.1.60
 
 # Utils
 python-dotenv>=1.0.0
+
+# Policy REST API
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0

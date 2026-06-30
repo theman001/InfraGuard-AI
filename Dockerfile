@@ -49,23 +49,23 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # 앱 소스 복사
 COPY app/       ./app/
 COPY core/      ./core/
+COPY api/       ./api/
 COPY prompts/   ./prompts/
 COPY data/laws_registry.json ./data/laws_registry.json
 COPY .streamlit/config.toml ./.streamlit/config.toml
+COPY start.sh   ./start.sh
 
 # 데이터 디렉토리 생성 (볼륨 마운트 전 owner 설정)
 RUN mkdir -p /app/db /app/data/chroma_db /app/.cache/huggingface
 
 # 포트
 EXPOSE 8501
+EXPOSE 8000
 
 # Streamlit 환경 설정
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# 실행
-CMD ["streamlit", "run", "app/main.py", \
-     "--server.port=8501", \
-     "--server.address=0.0.0.0", \
-     "--server.headless=true", \
-     "--server.fileWatcherType=none"]
+# 실행 (uvicorn:8000 백그라운드 + streamlit:8501 포그라운드)
+RUN chmod +x /app/start.sh
+CMD ["/bin/sh", "/app/start.sh"]
