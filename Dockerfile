@@ -60,7 +60,7 @@ RUN mkdir -p /app/db /app/data/chroma_db /app/.cache/huggingface
 
 # 포트
 EXPOSE 8501
-EXPOSE 8000
+EXPOSE 8090
 
 # Streamlit 환경 설정
 ENV PYTHONUNBUFFERED=1
